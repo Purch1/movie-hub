@@ -171,6 +171,7 @@
     align-items: center;
     gap: 1rem;
     margin-bottom: 1.5rem;
+    width: 100%;
   }
 
   .back-to-home-button {
@@ -183,6 +184,8 @@
     cursor: pointer;
     transition: background-color 0.2s;
     font-weight: 500;
+    align-self: flex-start;
+    margin-left: 1rem;
   }
 
   .back-to-home-button:hover {
