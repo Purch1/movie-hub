@@ -1,31 +1,44 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { getMovieDetails } from '../services/api';
+import { getMovieDetails, getMovieCredits, getMovieRecommendations } from '../services/api';
 import { useMoveieContext } from '../contexts/MovieContext';
+import MovieCard from '../components/MovieCard';
 import '../css/MovieDetails.css';
+import MovieList from '../components/MovieList';
 
 const MovieDetails = () => {
   const [movie, setMovie] = useState(null);
+  const [credits, setCredits] = useState(null);
+  const [recommendations, setRecommendations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const { id } = useParams();
   const { isFavorite, addToFavorites, removeFromFavorites } = useMoveieContext();
 
   useEffect(() => {
-    const fetchMovieDetails = async () => {
+    const fetchMovieData = async () => {
       try {
         setLoading(true);
-        const data = await getMovieDetails(id);
-        setMovie(data);
+        const [movieData, creditsData, recommendationsData] = await Promise.all([
+          getMovieDetails(id),
+          getMovieCredits(id),
+          getMovieRecommendations(id)
+        ]);
+        
+        setMovie(movieData);
+        setCredits(creditsData);
+        setRecommendations(recommendationsData);
         setLoading(false);
       } catch (err) {
-        setError('Failed to load movie details');
+        setError('Failed to load movie data');
         setLoading(false);
         console.error(err);
       }
     };
 
-    fetchMovieDetails();
+    fetchMovieData();
+    // Scroll to top when movie ID changes
+    window.scrollTo(0, 0);
   }, [id]);
 
   const handleFavoriteClick = () => {
@@ -39,6 +52,9 @@ const MovieDetails = () => {
   if (loading) return <div className="movie-details-loading">Loading...</div>;
   if (error) return <div className="movie-details-error">{error}</div>;
   if (!movie) return <div className="movie-details-error">Movie not found</div>;
+
+  // Get top cast (limited to 6)
+  const topCast = credits?.cast?.slice(0, 6) || [];
 
   return (
     <div className="movie-details-container">
@@ -98,6 +114,49 @@ const MovieDetails = () => {
           </div>
         </div>
       </div>
+      
+      {/* Cast Section */}
+      {topCast.length > 0 && (
+        <div className="cast-section">
+          <h2>Top Cast</h2>
+          <div className="cast-list">
+            {topCast.map(person => (
+              <div key={person.id} className="cast-item">
+                <div className="cast-profile">
+                  {person.profile_path ? (
+                    <img 
+                      src={`https://image.tmdb.org/t/p/w185${person.profile_path}`} 
+                      alt={person.name}
+                    />
+                  ) : (
+                    <div className="no-profile">
+                      <span>No Image</span>
+                    </div>
+                  )}
+                </div>
+                <div className="cast-info">
+                  <h4>{person.name}</h4>
+                  <p>{person.character}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+      
+      {/* Recommendations Section */}
+      {recommendations.length > 0 && (
+        <div className="recommendations-section">
+          <h2>You May Also Like</h2>
+          <div className="movie-list horizontal-scroll">
+            {recommendations.map(movie => (
+              <div className="movie-list-item" key={movie.id}>
+                <MovieCard movie={movie} />
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
