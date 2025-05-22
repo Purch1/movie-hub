@@ -1,0 +1,75 @@
+.movie-list-container {
+  margin: 2rem 0;
+}
+
+.movie-list-container h2 {
+  margin-bottom: 1.5rem;
+  font-size: 1.8rem;
+  color: #fff;
+  position: relative;
+  display: inline-block;
+}
+
+.movie-list-container h2::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -8px;
+  width: 40%;
+  height: 3px;
+  background-color: #e50914;
+}
+
+.movie-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 1.5rem;
+}
+
+.movie-list-item {
+  height: 100%;
+}
+
+.no-movies {
+  color: #999;
+  font-style: italic;
+}
+
+/* Horizontal Scrolling for recommendations */
+.horizontal-scroll {
+  display: flex;
+  overflow-x: auto;
+  gap: 1rem;
+  padding-bottom: 1rem;
+  scrollbar-width: thin;
+  scrollbar-color: #e50914 #333;
+}
+
+.horizontal-scroll::-webkit-scrollbar {
+  height: 8px;
+}
+
+.horizontal-scroll::-webkit-scrollbar-track {
+  background: #333;
+  border-radius: 10px;
+}
+
+.horizontal-scroll::-webkit-scrollbar-thumb {
+  background-color: #e50914;
+  border-radius: 10px;
+}
+
+.horizontal-scroll .movie-list-item {
+  flex: 0 0 160px;
+}
+
+@media (max-width: 768px) {
+  .movie-list {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 1rem;
+  }
+  
+  .horizontal-scroll .movie-list-item {
+    flex: 0 0 140px;
+  }
+}
