@@ -1,9 +1,18 @@
 .movie-list-container {
   margin: 2rem 0;
+  width: 100%;
+}
+
+.movie-list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding: 0;
 }
 
 .movie-list-container h2 {
-  margin-bottom: 1.5rem;
+  margin-bottom: 0;
   font-size: 1.8rem;
   color: #fff;
   position: relative;
@@ -20,29 +29,40 @@
   background-color: #e50914;
 }
 
+.view-all-button {
+  background-color: transparent;
+  border: 2px solid #e50914;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+
+.view-all-button:hover {
+  background-color: #e50914;
+}
+
+/* Grid layout for regular lists */
 .movie-list {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  grid-template-columns: repeat(5, 1fr);
   gap: 1.5rem;
+  padding: 0;
 }
 
-.movie-list-item {
-  height: 100%;
-}
-
-.no-movies {
-  color: #999;
-  font-style: italic;
-}
-
-/* Horizontal Scrolling for recommendations */
+/* Horizontal scrolling style */
 .horizontal-scroll {
   display: flex;
   overflow-x: auto;
+  grid-template-columns: none;
   gap: 1rem;
-  padding-bottom: 1rem;
+  padding: 0 0 1rem 0;
   scrollbar-width: thin;
   scrollbar-color: #e50914 #333;
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
 }
 
 .horizontal-scroll::-webkit-scrollbar {
@@ -59,17 +79,91 @@
   border-radius: 10px;
 }
 
+/* Set fixed width for initial and scrollable items */
 .horizontal-scroll .movie-list-item {
-  flex: 0 0 160px;
+  flex: 0 0 calc(20% - 0.8rem); /* 20% = 5 items, minus a bit for the gap */
+  min-width: 250px;
+  margin-right: 0.2rem;
+}
+
+/* Equal height for movie cards */
+.movie-list-item {
+  height: 100%;
+  display: flex;
+}
+
+.movie-list-item > * {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Force equal heights for movie cards by setting aspect ratio */
+.movie-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.movie-poster {
+  height: 0;
+  padding-bottom: 150%; /* 2:3 aspect ratio */
+  position: relative;
+}
+
+.movie-poster > img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.no-movies {
+  color: #999;
+  font-style: italic;
+}
+
+@media (max-width: 1200px) {
+  .movie-list {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  
+  .horizontal-scroll .movie-list-item {
+    flex: 0 0 calc(25% - 0.75rem);
+  }
+}
+
+@media (max-width: 992px) {
+  .movie-list {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  
+  .horizontal-scroll .movie-list-item {
+    flex: 0 0 calc(33.333% - 0.67rem);
+  }
 }
 
 @media (max-width: 768px) {
   .movie-list {
-    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    grid-template-columns: repeat(2, 1fr);
     gap: 1rem;
   }
   
   .horizontal-scroll .movie-list-item {
-    flex: 0 0 140px;
+    flex: 0 0 calc(50% - 0.5rem);
+    min-width: 160px;
+  }
+}
+
+@media (max-width: 480px) {
+  .movie-list {
+    grid-template-columns: repeat(1, 1fr);
+  }
+  
+  .horizontal-scroll .movie-list-item {
+    flex: 0 0 calc(100% - 1rem);
+    min-width: 140px;
   }
 }
