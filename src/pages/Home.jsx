@@ -1,34 +1,54 @@
 import "../css/Home.css";
 import { useEffect, useState } from "react";
-import { searchMovies, getPopularMovies, getGenres, getMoviesByGenre } from "../services/api";
+import { searchMovies, getPopularMovies, getGenres, getMoviesByGenre, getTopRatedMovies } from "../services/api";
 import MovieList from "../components/MovieList";
 import GenreFilter from "../components/GenreFilter";
 import Pagination from "../components/Pagination";
 
 function Home() {
     const [searchQuery, setSearchQuery] = useState("");
-    const [movies, setMovies] = useState([]);
+    const [topRatedMovies, setTopRatedMovies] = useState([]);
+    const [popularMovies, setPopularMovies] = useState([]);
+    const [genreMovies, setGenreMovies] = useState({});
+    const [featuredGenres, setFeaturedGenres] = useState([]);
     const [genres, setGenres] = useState([]);
     const [selectedGenres, setSelectedGenres] = useState([]);
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(true);
-    const [title, setTitle] = useState("Popular Movies");
-    const [currentPage, setCurrentPage] = useState(1);
-    const [totalPages, setTotalPages] = useState(1);
-    const [lastQuery, setLastQuery] = useState("");
+    const [searchResults, setSearchResults] = useState([]);
+    const [isSearching, setIsSearching] = useState(false);
 
     useEffect(() => {
         const loadInitialData = async () => {
             try {
                 setLoading(true);
-                const [popularMoviesData, genreList] = await Promise.all([
+                // Fetch all necessary data in parallel
+                const [topRatedData, popularData, genreList] = await Promise.all([
+                    getTopRatedMovies(),
                     getPopularMovies(),
                     getGenres()
                 ]);
                 
-                setMovies(popularMoviesData.results);
-                setTotalPages(popularMoviesData.total_pages);
-                setGenres(genreList);
+                setTopRatedMovies(topRatedData.results || []);
+                setPopularMovies(popularData.results || []);
+                setGenres(genreList || []);
+                
+                // Select 3 popular genres to feature
+                const popularGenreIds = [28, 35, 14]; // Action, Comedy, Fantasy
+                setFeaturedGenres(
+                    genreList.filter(genre => popularGenreIds.includes(genre.id)) || []
+                );
+                
+                // Fetch movies for each featured genre
+                const genreMoviesMap = {};
+                await Promise.all(
+                    popularGenreIds.map(async (genreId) => {
+                        const genreData = await getMoviesByGenre(genreId);
+                        genreMoviesMap[genreId] = genreData.results || [];
+                    })
+                );
+                
+                setGenreMovies(genreMoviesMap);
                 setError(null);
             } catch (error) {
                 console.error("Error fetching initial data:", error);
@@ -41,64 +61,6 @@ function Home() {
         loadInitialData();
     }, []);
 
-    useEffect(() => {
-        const fetchMoviesByGenres = async () => {
-            if (selectedGenres.length === 0 && !lastQuery) {
-                // If no genres selected and no search query, show popular movies
-                try {
-                    setLoading(true);
-                    const popularMoviesData = await getPopularMovies(currentPage);
-                    setMovies(popularMoviesData.results);
-                    setTotalPages(popularMoviesData.total_pages);
-                    setTitle("Popular Movies");
-                    setError(null);
-                } catch (error) {
-                    setError("Failed to load popular movies.");
-                } finally {
-                    setLoading(false);
-                }
-                return;
-            }
-
-            if (lastQuery) {
-                // If there's a search query, fetch search results for current page
-                try {
-                    setLoading(true);
-                    const searchData = await searchMovies(lastQuery, currentPage);
-                    setMovies(searchData.results);
-                    setTotalPages(searchData.total_pages);
-                    setTitle(`Search Results: "${lastQuery}"`);
-                    setError(null);
-                } catch (error) {
-                    setError("Failed to search movies.");
-                } finally {
-                    setLoading(false);
-                }
-                return;
-            }
-
-            try {
-                setLoading(true);
-                // Filter by the selected genre
-                const genreMoviesData = await getMoviesByGenre(selectedGenres[0], currentPage);
-                setMovies(genreMoviesData.results);
-                setTotalPages(genreMoviesData.total_pages);
-                
-                // Get the name of the selected genre
-                const genreName = genres.find(g => g.id === selectedGenres[0])?.name || "Genre";
-                setTitle(`${genreName} Movies`);
-                setError(null);
-            } catch (error) {
-                console.error("Error fetching movies by genre:", error);
-                setError("Failed to load genre movies.");
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchMoviesByGenres();
-    }, [selectedGenres, currentPage, lastQuery]);
-
     const handleSearch = async (e) => {
         e.preventDefault();
         if (searchQuery.trim() === "") {
@@ -108,19 +70,15 @@ function Home() {
         if(loading) return;
 
         setLoading(true);
+        setIsSearching(true);
 
         try {
-            const searchData = await searchMovies(searchQuery, 1);
+            const searchData = await searchMovies(searchQuery);
             if (searchData.results.length === 0) {
                 setError("No results found.");
             } else {
-                setMovies(searchData.results);
-                setTotalPages(searchData.total_pages);
-                setTitle(`Search Results: "${searchQuery}"`);
+                setSearchResults(searchData.results);
                 setError(null);
-                setSelectedGenres([]); // Clear genre selection when searching
-                setLastQuery(searchQuery); // Save the search query
-                setCurrentPage(1); // Reset to first page
             }
         } catch (error) {
             setError("Failed to search movies.");
@@ -132,9 +90,6 @@ function Home() {
     };
 
     const handleGenreSelect = (genreId) => {
-        setCurrentPage(1); // Reset to first page when changing genres
-        setLastQuery(""); // Clear any search query
-        
         setSelectedGenres(prevSelectedGenres => {
             if (prevSelectedGenres.includes(genreId)) {
                 // If already selected, remove it
@@ -144,11 +99,25 @@ function Home() {
                 return [genreId];
             }
         });
+        
+        setIsSearching(true);
     };
 
-    const handlePageChange = (pageNumber) => {
-        setCurrentPage(pageNumber);
-        window.scrollTo({ top: 0, behavior: 'smooth' }); // Scroll to top when changing pages
+    const renderMovieRow = (movies, title) => {
+        if (!movies || movies.length === 0) return null;
+        
+        return (
+            <div className="movie-row-container">
+                <h2 className="row-title">{title}</h2>
+                <div className="movie-row">
+                    {movies.slice(0, 5).map(movie => (
+                        <div className="movie-row-item" key={movie.id}>
+                            <MovieList movies={[movie]} title="" />
+                        </div>
+                    ))}
+                </div>
+            </div>
+        );
     };
 
     return (
@@ -180,17 +149,44 @@ function Home() {
             
             {loading ? (
                 <div className="loading">Loading...</div>
+            ) : isSearching ? (
+                <div className="search-results-container">
+                    <h2 className="section-title">Search Results</h2>
+                    <MovieList 
+                        movies={searchResults} 
+                        showViewAll={false}
+                        horizontalScroll={false}
+                    />
+                </div>
             ) : (
-                <>
-                    <MovieList movies={movies} title={title} />
-                    {totalPages > 1 && (
-                        <Pagination
-                            currentPage={currentPage}
-                            totalPages={totalPages}
-                            onPageChange={handlePageChange}
+                <div className="home-content">
+                    <MovieList 
+                        movies={topRatedMovies} 
+                        title="Top Rated Movies" 
+                        maxMovies={10}
+                        viewAllLink="/top-rated" 
+                        horizontalScroll={true}
+                    />
+                    
+                    <MovieList 
+                        movies={popularMovies} 
+                        title="Popular Movies" 
+                        maxMovies={10}
+                        viewAllLink="/popular" 
+                        horizontalScroll={true}
+                    />
+                    
+                    {featuredGenres.map(genre => (
+                        <MovieList 
+                            key={genre.id}
+                            movies={genreMovies[genre.id]} 
+                            title={`${genre.name} Movies`}
+                            maxMovies={10}
+                            viewAllLink={`/genre/${genre.id}`}
+                            horizontalScroll={true}
                         />
-                    )}
-                </>
+                    ))}
+                </div>
             )}
         </div>
     );
