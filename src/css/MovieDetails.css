@@ -269,11 +269,11 @@
   }
   
   .movie-genres {
-    justify-content: center;
+    justify-content: left;
   }
   
   .movie-tagline {
-    text-align: center;
+    text-align: left;
   }
   
   .cast-section, 
