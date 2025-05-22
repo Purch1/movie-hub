@@ -161,3 +161,98 @@
       background-color: #f9f9f9;
     }
   }
+
+  /* Film Reel Loading Animation */
+  .loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 300px;
+    width: 100%;
+  }
+  
+  .loading-reel {
+    position: relative;
+    width: 100px;
+    height: 100px;
+    animation: spin 2s linear infinite;
+  }
+  
+  .loading-reel:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: 8px solid rgba(255, 255, 255, 0.1);
+    border-top: 8px solid #e50914;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+  
+  .loading-reel:after {
+    content: '';
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    right: 15px;
+    bottom: 15px;
+    border: 6px solid transparent;
+    border-top: 6px solid rgba(255, 255, 255, 0.8);
+    border-radius: 50%;
+    animation: spin 1.5s linear infinite reverse;
+  }
+  
+  .loading-text {
+    margin-top: 20px;
+    font-size: 18px;
+    color: #e50914;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    animation: pulse 1.5s ease-in-out infinite;
+  }
+  
+  .loading-frames {
+    display: flex;
+    justify-content: center;
+    margin-top: 10px;
+  }
+  
+  .loading-frame {
+    width: 12px;
+    height: 20px;
+    background-color: rgba(255, 255, 255, 0.2);
+    margin: 0 3px;
+    border-radius: 2px;
+    animation: frameMove 2s ease-in-out infinite;
+  }
+  
+  .loading-frame:nth-child(2) {
+    animation-delay: 0.2s;
+  }
+  
+  .loading-frame:nth-child(3) {
+    animation-delay: 0.4s;
+  }
+  
+  .loading-frame:nth-child(4) {
+    animation-delay: 0.6s;
+  }
+  
+  .loading-frame:nth-child(5) {
+    animation-delay: 0.8s;
+  }
+  
+  @keyframes frameMove {
+    0%, 100% {
+      transform: scaleY(1);
+      background-color: rgba(255, 255, 255, 0.2);
+    }
+    50% {
+      transform: scaleY(1.5);
+      background-color: rgba(229, 9, 20, 0.6);
+    }
+  }
