@@ -89,7 +89,7 @@ function Home() {
         setSearchQuery("");
     };
 
-    const handleGenreSelect = (genreId) => {
+    const handleGenreSelect = async (genreId) => {
         setSelectedGenres(prevSelectedGenres => {
             if (prevSelectedGenres.includes(genreId)) {
                 // If already selected, remove it
@@ -101,6 +101,25 @@ function Home() {
         });
         
         setIsSearching(true);
+        setLoading(true);
+        
+        try {
+            // Only fetch movies if a genre is being selected (not deselected)
+            if (!selectedGenres.includes(genreId)) {
+                const genreData = await getMoviesByGenre(genreId);
+                setSearchResults(genreData.results || []);
+                setError(null);
+            } else {
+                // If deselecting, clear search results
+                setIsSearching(false);
+            }
+        } catch (error) {
+            console.error("Error fetching genre movies:", error);
+            setError("Failed to load movies for this genre. Please try again later.");
+            setSearchResults([]);
+        } finally {
+            setLoading(false);
+        }
     };
 
     const renderMovieRow = (movies, title) => {
@@ -134,11 +153,24 @@ function Home() {
             </form>
 
             {genres.length > 0 && (
-                <GenreFilter 
-                    genres={genres} 
-                    selectedGenres={selectedGenres} 
-                    onGenreSelect={handleGenreSelect}
-                />
+                <div className="genre-filter-container">
+                    <GenreFilter 
+                        genres={genres} 
+                        selectedGenres={selectedGenres} 
+                        onGenreSelect={handleGenreSelect}
+                    />
+                    {isSearching && (
+                        <button 
+                            className="back-to-home-button" 
+                            onClick={() => {
+                                setIsSearching(false);
+                                setSelectedGenres([]);
+                            }}
+                        >
+                            Back to Home
+                        </button>
+                    )}
+                </div>
             )}
 
             {error && (

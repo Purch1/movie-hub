@@ -1,15 +1,16 @@
-import { useMoveieContext } from "../contexts/MovieContext";
+import { useMovieContext } from "../contexts/MovieContext";
 import { Link } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { getMovieDetails, getGenres } from "../services/api";
 import "../css/MovieCard.css";
 
 function MovieCard({movie}) {
-    const { isFavorite, addToFavorites, removeFromFavorites } = useMoveieContext();
+    const { isFavorite, addToFavorites, removeFromFavorites } = useMovieContext();
     const favorite = isFavorite(movie.id);
     const [genres, setGenres] = useState([]);
     const [movieDetails, setMovieDetails] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
+    const [hasTriedToFetch, setHasTriedToFetch] = useState(false);
 
     // Get all available genres once
     useEffect(() => {
@@ -25,20 +26,25 @@ function MovieCard({movie}) {
         fetchGenres();
     }, []);
 
-    // Get movie runtime when hovered
-    const handleMouseEnter = async () => {
-        if (!movieDetails && !isLoading) {
-            setIsLoading(true);
-            try {
-                const details = await getMovieDetails(movie.id);
-                setMovieDetails(details);
-            } catch (error) {
-                console.error(`Failed to fetch details for movie ${movie.id}:`, error);
-            } finally {
-                setIsLoading(false);
-            }
+    // Get movie runtime when hovered using debounce to prevent excessive API calls
+    const handleMouseEnter = useCallback(() => {
+        if (!movieDetails && !isLoading && !hasTriedToFetch) {
+            const timer = setTimeout(async () => {
+                setIsLoading(true);
+                try {
+                    const details = await getMovieDetails(movie.id);
+                    setMovieDetails(details);
+                } catch (error) {
+                    console.error(`Failed to fetch details for movie ${movie.id}:`, error);
+                } finally {
+                    setIsLoading(false);
+                    setHasTriedToFetch(true);
+                }
+            }, 300); // 300ms debounce
+            
+            return () => clearTimeout(timer);
         }
-    };
+    }, [movie.id, movieDetails, isLoading, hasTriedToFetch]);
 
     function onFavoriteClick(e) {
         e.preventDefault();

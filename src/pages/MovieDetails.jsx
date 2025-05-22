@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getMovieDetails, getMovieCredits, getMovieRecommendations } from '../services/api';
-import { useMoveieContext } from '../contexts/MovieContext';
+import { useMovieContext } from '../contexts/MovieContext';
 import MovieCard from '../components/MovieCard';
 import '../css/MovieDetails.css';
 import MovieList from '../components/MovieList';
@@ -14,7 +14,7 @@ const MovieDetails = () => {
   const [error, setError] = useState(null);
   const { id } = useParams();
   const navigate = useNavigate();
-  const { isFavorite, addToFavorites, removeFromFavorites } = useMoveieContext();
+  const { isFavorite, addToFavorites, removeFromFavorites } = useMovieContext();
 
   useEffect(() => {
     const fetchMovieData = async () => {

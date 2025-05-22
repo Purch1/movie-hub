@@ -1,11 +1,11 @@
 import React from "react";
-import { useMoveieContext } from "../contexts/MovieContext";
+import { useMovieContext } from "../contexts/MovieContext";
 import MovieList from "../components/MovieList";
 import "../css/Home.css";
 import "../css/Favorites.css";
 
 function Favorites() {
-  const { favorites } = useMoveieContext();
+  const { favorites } = useMovieContext();
 
   if (favorites && favorites.length > 0) {
     return (
