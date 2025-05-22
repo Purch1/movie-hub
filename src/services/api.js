@@ -28,3 +28,21 @@ export const getMovieDetails = async (movieId) => {
     const data = await response.json();
     return data;
 }
+
+export const getMovieRecommendations = async (movieId) => {
+    const response = await fetch(`${BASE_URL}/movie/${movieId}/recommendations?api_key=${API_KEY}`);
+    if (!response.ok) {
+        throw new Error("Failed to fetch movie recommendations");
+    }
+    const data = await response.json();
+    return data.results;
+}
+
+export const getMovieCredits = async (movieId) => {
+    const response = await fetch(`${BASE_URL}/movie/${movieId}/credits?api_key=${API_KEY}`);
+    if (!response.ok) {
+        throw new Error("Failed to fetch movie credits");
+    }
+    const data = await response.json();
+    return data;
+}
