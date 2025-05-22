@@ -1,6 +1,6 @@
 import { useMovieContext } from "../contexts/MovieContext";
 import { Link } from "react-router-dom";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { getMovieDetails, getGenres } from "../services/api";
 import "../css/MovieCard.css";
 
@@ -10,7 +10,6 @@ function MovieCard({movie}) {
     const [genres, setGenres] = useState([]);
     const [movieDetails, setMovieDetails] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
-    const [hasTriedToFetch, setHasTriedToFetch] = useState(false);
 
     // Get all available genres once
     useEffect(() => {
@@ -26,10 +25,11 @@ function MovieCard({movie}) {
         fetchGenres();
     }, []);
 
-    // Get movie runtime when hovered using debounce to prevent excessive API calls
-    const handleMouseEnter = useCallback(() => {
-        if (!movieDetails && !isLoading && !hasTriedToFetch) {
-            const timer = setTimeout(async () => {
+    // Fetch movie details immediately when component mounts
+    useEffect(() => {
+        const fetchMovieDetails = async () => {
+            // Only fetch if we don't already have the details and movie has runtime property
+            if (!movieDetails && !movie.runtime) {
                 setIsLoading(true);
                 try {
                     const details = await getMovieDetails(movie.id);
@@ -38,13 +38,15 @@ function MovieCard({movie}) {
                     console.error(`Failed to fetch details for movie ${movie.id}:`, error);
                 } finally {
                     setIsLoading(false);
-                    setHasTriedToFetch(true);
                 }
-            }, 300); // 300ms debounce
-            
-            return () => clearTimeout(timer);
-        }
-    }, [movie.id, movieDetails, isLoading, hasTriedToFetch]);
+            }
+        };
+
+        // Add a small delay to avoid overwhelming the API with too many requests at once
+        const timer = setTimeout(fetchMovieDetails, Math.random() * 1000);
+        
+        return () => clearTimeout(timer);
+    }, [movie.id, movie.runtime, movieDetails]);
 
     function onFavoriteClick(e) {
         e.preventDefault();
@@ -72,15 +74,21 @@ function MovieCard({movie}) {
 
     // Format runtime from minutes to hours and minutes
     const formatRuntime = (minutes) => {
-        if (!minutes) return "";
+        if (!minutes || minutes === 0) return "";
         const hours = Math.floor(minutes / 60);
         const mins = minutes % 60;
-        return `${hours}h ${mins}m`;
+        if (hours === 0) return `${mins}m`;
+        return `${hours}h ${mins > 0 ? ` ${mins}m` : ''}`;
+    };
+
+    // Get the runtime from either the movie prop (if available) or movieDetails
+    const getRuntime = () => {
+        return movie.runtime || movieDetails?.runtime || 0;
     };
 
     return (
         <Link to={`/movie/${movie.id}`} className="movie-card-link">
-            <div className="movie-card" onMouseEnter={handleMouseEnter}>
+            <div className="movie-card">
                 <div className="movie-poster">
                     <img src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`} alt={movie.title} />
                     <div className="movie-overlay">
@@ -100,8 +108,8 @@ function MovieCard({movie}) {
                     <h3>{movie.title}</h3>
                     <div className="movie-meta">
                         {movie.release_date && <span className="movie-year">{movie.release_date.split('-')[0]}</span>}
-                        {movieDetails && movieDetails.runtime > 0 && (
-                            <span className="movie-duration">{formatRuntime(movieDetails.runtime)}</span>
+                        {getRuntime() > 0 && (
+                            <span className="movie-duration">{formatRuntime(getRuntime())}</span>
                         )}
                     </div>
                     <p className="movie-genres">{getGenreNames()}</p>
