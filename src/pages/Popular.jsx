@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { getTopRatedMovies } from '../services/api';
+import { getPopularMovies } from '../services/api';
 import MovieList from '../components/MovieList';
 import Pagination from '../components/Pagination';
-import '../css/Home.css'; // Reusing Home CSS since the layout is similar
+import '../css/Home.css';
 
-const TopRated = () => {
+const Popular = () => {
   const [movies, setMovies] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -13,22 +13,22 @@ const TopRated = () => {
   const [totalPages, setTotalPages] = useState(1);
 
   useEffect(() => {
-    const fetchTopRatedMovies = async () => {
+    const fetchPopularMovies = async () => {
       try {
         setLoading(true);
-        const data = await getTopRatedMovies(currentPage);
+        const data = await getPopularMovies(currentPage);
         setMovies(data.results);
         setTotalPages(data.total_pages);
         setError(null);
       } catch (err) {
-        console.error('Error fetching top rated movies:', err);
-        setError('Failed to load top rated movies. Please try again later.');
+        console.error('Error fetching popular movies:', err);
+        setError('Failed to load popular movies. Please try again later.');
       } finally {
         setLoading(false);
       }
     };
 
-    fetchTopRatedMovies();
+    fetchPopularMovies();
     // Scroll to top when page changes
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [currentPage]);
@@ -39,11 +39,12 @@ const TopRated = () => {
 
   return (
     <div className="home">
-      <h1 className="page-title">Top Rated Movies</h1>
+           
+      <h1 className="page-title">Popular Movies</h1>
       <p className="page-description">
-        Discover critically acclaimed films with the highest ratings from audiences around the world.
+        Discover the most trending and popular movies being watched right now.
       </p>
-      
+
       <div className="page-header">
         <Link to="/" className="back-button">Back to Home</Link>
       </div>
@@ -58,7 +59,7 @@ const TopRated = () => {
             movies={movies} 
             showViewAll={false}
             horizontalScroll={false}
-            maxMovies={15}
+            maxMovies={15} 
           />
           {totalPages > 1 && (
             <Pagination
@@ -73,4 +74,4 @@ const TopRated = () => {
   );
 };
 
-export default TopRated;
+export default Popular;

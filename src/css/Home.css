@@ -3,6 +3,36 @@
     box-sizing: border-box;
   }
   
+  .page-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+
+  .back-button {
+    background-color: transparent;
+    color: white;
+    border: 2px solid #e50914;
+    border-radius: 4px;
+    padding: 0.5rem 1rem;
+    margin-right: 1rem;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .back-button:hover {
+    background-color: #e50914;
+  }
+
+  .back-button::before {
+    content: "←";
+    margin-right: 0.5rem;
+  }
+
   .search-form {
     max-width: 600px;
     margin: 0 auto 2rem;
