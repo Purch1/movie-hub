@@ -63,7 +63,15 @@ const GenreMovies = () => {
       {error && <div className="error-message">{error}</div>}
       
       {loading ? (
-        <div className="loading">Loading...</div>
+        <div className="loading">
+          <div className="loading-reel">
+            <div className="reel-hole"></div>
+            <div className="reel-hole"></div>
+            <div className="reel-hole"></div>
+            <div className="reel-hole"></div>
+          </div>
+          <div className="loading-text">Loading movies...</div>
+        </div>
       ) : (
         <>
           <MovieList 

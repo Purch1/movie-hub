@@ -97,10 +97,109 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    flex-direction: column;
     height: 200px;
     color: #fff;
     font-size: 1.2rem;
   }
+
+  .loading-spinner {
+    position: relative;
+    width: 80px;
+    height: 80px;
+    margin-bottom: 20px;
+  }
+
+  .loading-spinner:before {
+    content: '';
+    box-sizing: border-box;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    border: 4px solid transparent;
+    border-top-color: #e50914;
+    border-bottom-color: #e50914;
+    animation: spin 1.5s linear infinite;
+  }
+
+  .loading-spinner:after {
+    content: '';
+    box-sizing: border-box;
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    border: 4px solid transparent;
+    border-left-color: #fff;
+    border-right-color: #fff;
+    animation: spin 1s linear infinite reverse;
+  }
+
+  .loading-text {
+    color: #fff;
+    font-size: 1.2rem;
+    opacity: 0.8;
+    animation: pulse 1.5s infinite;
+  }
+
+  @keyframes spin {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+
+  @keyframes pulse {
+    0%, 100% {
+      opacity: 0.5;
+    }
+    50% {
+      opacity: 1;
+    }
+  }
+
+  /* Film reel dots animation */
+  .loading-reel {
+    position: relative;
+    width: 80px;
+    height: 80px;
+    margin-bottom: 20px;
+    border-radius: 50%;
+    background-color: rgba(229, 9, 20, 0.8);
+    animation: spin 2s linear infinite;
+  }
+
+  .loading-reel:before {
+    content: '';
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    right: 10px;
+    bottom: 10px;
+    background-color: #141414;
+    border-radius: 50%;
+  }
+
+  .reel-hole {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background-color: #141414;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+  }
+
+  .reel-hole:nth-child(1) { top: 15px; left: 50%; transform: translateX(-50%); }
+  .reel-hole:nth-child(2) { top: 50%; right: 15px; transform: translateY(-50%); }
+  .reel-hole:nth-child(3) { bottom: 15px; left: 50%; transform: translateX(-50%); }
+  .reel-hole:nth-child(4) { top: 50%; left: 15px; transform: translateY(-50%); }
   
   @media (max-width: 639px) {
     .home {

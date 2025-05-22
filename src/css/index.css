@@ -70,6 +70,85 @@
     outline: 4px auto -webkit-focus-ring-color;
   }
   
+  /* Loading Animation Styles */
+  .loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 200px;
+    width: 100%;
+    padding: 2rem;
+  }
+  
+  .loading-reel {
+    position: relative;
+    width: 80px;
+    height: 80px;
+    background-color: #1a1a1a;
+    border-radius: 50%;
+    border: 6px solid #646cff;
+    animation: spin 2s linear infinite;
+    margin-bottom: 1rem;
+    box-shadow: 0 0 20px rgba(100, 108, 255, 0.4);
+  }
+  
+  .reel-hole {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    background-color: #646cff;
+    border-radius: 50%;
+    border: 2px solid #1a1a1a;
+  }
+  
+  .reel-hole:nth-child(1) {
+    top: 10px;
+    left: 10px;
+  }
+  
+  .reel-hole:nth-child(2) {
+    top: 10px;
+    right: 10px;
+  }
+  
+  .reel-hole:nth-child(3) {
+    bottom: 10px;
+    left: 10px;
+  }
+  
+  .reel-hole:nth-child(4) {
+    bottom: 10px;
+    right: 10px;
+  }
+  
+  .loading-text {
+    font-size: 1.2rem;
+    color: #646cff;
+    margin-top: 0.5rem;
+    font-weight: 500;
+    text-shadow: 0 0 10px rgba(100, 108, 255, 0.3);
+    animation: pulse 1.5s ease-in-out infinite;
+  }
+  
+  @keyframes spin {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+  
+  @keyframes pulse {
+    0%, 100% {
+      opacity: 0.7;
+    }
+    50% {
+      opacity: 1;
+    }
+  }
+  
   @media (prefers-color-scheme: light) {
     :root {
       color: #213547;

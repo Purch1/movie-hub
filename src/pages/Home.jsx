@@ -180,7 +180,15 @@ function Home() {
             )}
             
             {loading ? (
-                <div className="loading">Loading...</div>
+                <div className="loading">
+                  <div className="loading-reel">
+                    <div className="reel-hole"></div>
+                    <div className="reel-hole"></div>
+                    <div className="reel-hole"></div>
+                    <div className="reel-hole"></div>
+                  </div>
+                  <div className="loading-text">Loading movies...</div>
+                </div>
             ) : isSearching ? (
                 <div className="search-results-container">
                     <h2 className="section-title">Search Results</h2>
