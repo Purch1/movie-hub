@@ -45,7 +45,7 @@
     }
   }
   
-  .movies-grid {
+   .movies-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
     gap: 2rem;
@@ -53,20 +53,15 @@
     width: 100%;
     box-sizing: border-box;
     justify-items: center;
-  }
+  } 
 
-  /* Make sure movie cards have a consistent width */
-  .movie-card {
-    width: 100%;
-    max-width: 300px;
-  }
   
   /* Responsive adjustments */
-  @media (min-width: 640px) {
+   @media (min-width: 640px) {
     .movies-grid {
       grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     }
-  }
+  } 
   
   @media (min-width: 1024px) {
     .movies-grid {
@@ -78,4 +73,4 @@
   
   .movies-grid > * {
     animation: fadeIn 0.3s ease-out forwards;
-  }
+  } 
