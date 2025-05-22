@@ -58,9 +58,7 @@ const GenreMovies = () => {
         Browse our collection of {genreName.toLowerCase()} films.
       </p>
       
-      <div className="page-header">
         <Link to="/" className="back-button">Back to Home</Link>
-      </div>
 
       {error && <div className="error-message">{error}</div>}
       

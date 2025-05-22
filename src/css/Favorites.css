@@ -33,6 +33,36 @@
     line-height: 1.6;
   }
   
+  .empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    background-color: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    margin: 2rem auto;
+    max-width: 600px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .empty-state-icon {
+    font-size: 3rem;
+    margin-bottom: 1.5rem;
+    animation: pulse 1.5s infinite alternate ease-in-out;
+  }
+  
+  .empty-state h2 {
+    margin-bottom: 1rem;
+    font-size: 1.8rem;
+    color: #e50914;
+  }
+  
+  .empty-state p {
+    color: #999;
+    font-size: 1.2rem;
+    line-height: 1.6;
+  }
+  
   /* Animation for new favorites being added */
   @keyframes fadeIn {
     from {
@@ -45,9 +75,20 @@
     }
   }
   
+  @keyframes pulse {
+    from {
+      transform: scale(1);
+      opacity: 0.8;
+    }
+    to {
+      transform: scale(1.1);
+      opacity: 1;
+    }
+  }
+  
    .movies-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr, 1fr, 1fr, 1fr));  
     gap: 2rem;
     padding: 1rem;
     width: 100%;
@@ -55,7 +96,6 @@
     justify-items: center;
   } 
 
-  
   /* Responsive adjustments */
    @media (min-width: 640px) {
     .movies-grid {
@@ -73,4 +113,4 @@
   
   .movies-grid > * {
     animation: fadeIn 0.3s ease-out forwards;
-  } 
+  }

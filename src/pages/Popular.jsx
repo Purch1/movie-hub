@@ -45,9 +45,7 @@ const Popular = () => {
         Discover the most trending and popular movies being watched right now.
       </p>
 
-      <div className="page-header">
         <Link to="/" className="back-button">Back to Home</Link>
-      </div>
 
       {error && <div className="error-message">{error}</div>}
       
