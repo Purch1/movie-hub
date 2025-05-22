@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { getMovieDetails, getMovieCredits, getMovieRecommendations } from '../services/api';
 import { useMoveieContext } from '../contexts/MovieContext';
 import MovieCard from '../components/MovieCard';
@@ -13,6 +13,7 @@ const MovieDetails = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const { id } = useParams();
+  const navigate = useNavigate();
   const { isFavorite, addToFavorites, removeFromFavorites } = useMoveieContext();
 
   useEffect(() => {
@@ -58,6 +59,10 @@ const MovieDetails = () => {
 
   return (
     <div className="movie-details-container">
+      <button className="back-button" onClick={() => navigate(-1)}>
+        ← Back
+      </button>
+      
       <div className="movie-details-backdrop" 
            style={{ backgroundImage: `url(https://image.tmdb.org/t/p/original${movie.backdrop_path})` }}>
         <div className="backdrop-overlay"></div>

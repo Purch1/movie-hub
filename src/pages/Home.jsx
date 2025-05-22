@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { searchMovies, getPopularMovies, getGenres, getMoviesByGenre } from "../services/api";
 import MovieList from "../components/MovieList";
 import GenreFilter from "../components/GenreFilter";
+import Pagination from "../components/Pagination";
 
 function Home() {
     const [searchQuery, setSearchQuery] = useState("");
@@ -12,16 +13,21 @@ function Home() {
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(true);
     const [title, setTitle] = useState("Popular Movies");
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+    const [lastQuery, setLastQuery] = useState("");
 
     useEffect(() => {
         const loadInitialData = async () => {
             try {
                 setLoading(true);
-                const [popularMovies, genreList] = await Promise.all([
+                const [popularMoviesData, genreList] = await Promise.all([
                     getPopularMovies(),
                     getGenres()
                 ]);
-                setMovies(popularMovies);
+                
+                setMovies(popularMoviesData.results);
+                setTotalPages(popularMoviesData.total_pages);
                 setGenres(genreList);
                 setError(null);
             } catch (error) {
@@ -37,12 +43,13 @@ function Home() {
 
     useEffect(() => {
         const fetchMoviesByGenres = async () => {
-            if (selectedGenres.length === 0) {
-                // If no genres selected, show popular movies
+            if (selectedGenres.length === 0 && !lastQuery) {
+                // If no genres selected and no search query, show popular movies
                 try {
                     setLoading(true);
-                    const popularMovies = await getPopularMovies();
-                    setMovies(popularMovies);
+                    const popularMoviesData = await getPopularMovies(currentPage);
+                    setMovies(popularMoviesData.results);
+                    setTotalPages(popularMoviesData.total_pages);
                     setTitle("Popular Movies");
                     setError(null);
                 } catch (error) {
@@ -53,12 +60,29 @@ function Home() {
                 return;
             }
 
+            if (lastQuery) {
+                // If there's a search query, fetch search results for current page
+                try {
+                    setLoading(true);
+                    const searchData = await searchMovies(lastQuery, currentPage);
+                    setMovies(searchData.results);
+                    setTotalPages(searchData.total_pages);
+                    setTitle(`Search Results: "${lastQuery}"`);
+                    setError(null);
+                } catch (error) {
+                    setError("Failed to search movies.");
+                } finally {
+                    setLoading(false);
+                }
+                return;
+            }
+
             try {
                 setLoading(true);
-                // For simplicity, we'll filter by the first selected genre
-                // In a more advanced implementation, you could filter by multiple genres
-                const genreMovies = await getMoviesByGenre(selectedGenres[0]);
-                setMovies(genreMovies);
+                // Filter by the selected genre
+                const genreMoviesData = await getMoviesByGenre(selectedGenres[0], currentPage);
+                setMovies(genreMoviesData.results);
+                setTotalPages(genreMoviesData.total_pages);
                 
                 // Get the name of the selected genre
                 const genreName = genres.find(g => g.id === selectedGenres[0])?.name || "Genre";
@@ -73,7 +97,7 @@ function Home() {
         };
 
         fetchMoviesByGenres();
-    }, [selectedGenres]);
+    }, [selectedGenres, currentPage, lastQuery]);
 
     const handleSearch = async (e) => {
         e.preventDefault();
@@ -86,14 +110,17 @@ function Home() {
         setLoading(true);
 
         try {
-            const searchResults = await searchMovies(searchQuery);
-            if (searchResults.length === 0) {
+            const searchData = await searchMovies(searchQuery, 1);
+            if (searchData.results.length === 0) {
                 setError("No results found.");
             } else {
-                setMovies(searchResults);
+                setMovies(searchData.results);
+                setTotalPages(searchData.total_pages);
                 setTitle(`Search Results: "${searchQuery}"`);
                 setError(null);
                 setSelectedGenres([]); // Clear genre selection when searching
+                setLastQuery(searchQuery); // Save the search query
+                setCurrentPage(1); // Reset to first page
             }
         } catch (error) {
             setError("Failed to search movies.");
@@ -105,52 +132,68 @@ function Home() {
     };
 
     const handleGenreSelect = (genreId) => {
+        setCurrentPage(1); // Reset to first page when changing genres
+        setLastQuery(""); // Clear any search query
+        
         setSelectedGenres(prevSelectedGenres => {
             if (prevSelectedGenres.includes(genreId)) {
                 // If already selected, remove it
                 return prevSelectedGenres.filter(id => id !== genreId);
             } else {
                 // For this simple implementation, we'll only allow one selected genre
-                // In a more advanced implementation, you could allow multiple genres
                 return [genreId];
             }
         });
     };
 
+    const handlePageChange = (pageNumber) => {
+        setCurrentPage(pageNumber);
+        window.scrollTo({ top: 0, behavior: 'smooth' }); // Scroll to top when changing pages
+    };
+
     return (
-    <div className="home">
-        <form onSubmit={handleSearch} className="search-form">
-            <input 
-                type="text"
-                placeholder="Search for a movie..."
-                className="search-input" 
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-            />
-            <button type="submit" className="search-button">Search</button>
-        </form>
+        <div className="home">
+            <form onSubmit={handleSearch} className="search-form">
+                <input 
+                    type="text"
+                    placeholder="Search for a movie..."
+                    className="search-input" 
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                />
+                <button type="submit" className="search-button">Search</button>
+            </form>
 
-        {genres.length > 0 && (
-            <GenreFilter 
-                genres={genres} 
-                selectedGenres={selectedGenres} 
-                onGenreSelect={handleGenreSelect}
-            />
-        )}
+            {genres.length > 0 && (
+                <GenreFilter 
+                    genres={genres} 
+                    selectedGenres={selectedGenres} 
+                    onGenreSelect={handleGenreSelect}
+                />
+            )}
 
-        {error && (
-            <div className="error-message">
-                {error}
-            </div>
-        )}
-        
-        {loading ? (
-            <div className="loading">Loading...</div>
-        ) : (
-            <MovieList movies={movies} title={title} />
-        )}
-    </div>
-  );
+            {error && (
+                <div className="error-message">
+                    {error}
+                </div>
+            )}
+            
+            {loading ? (
+                <div className="loading">Loading...</div>
+            ) : (
+                <>
+                    <MovieList movies={movies} title={title} />
+                    {totalPages > 1 && (
+                        <Pagination
+                            currentPage={currentPage}
+                            totalPages={totalPages}
+                            onPageChange={handlePageChange}
+                        />
+                    )}
+                </>
+            )}
+        </div>
+    );
 }
 
 export default Home;
