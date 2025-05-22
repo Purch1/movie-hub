@@ -1,28 +1,41 @@
-import MovieCard from "../components/MovieCard";
+import React from "react";
 import { useMoveieContext } from "../contexts/MovieContext";
+import MovieList from "../components/MovieList";
+import "../css/Home.css";
 import "../css/Favorites.css";
 
 function Favorites() {
   const { favorites } = useMoveieContext();
 
-    if (favorites) {
-      return (
-        <div className="favorites">
-          <h2>Your Favorite Movies</h2>
-          <p>{favorites.length} movies</p>
-            <div className="movies-grid">
-            {favorites.map((movie) => (
-                <MovieCard movie={movie} key={movie.id} />
-            ))}
-            </div>
-        </div>
-      );
-    }
+  if (favorites && favorites.length > 0) {
+    return (
+      <div className="home">
+        <h1 className="page-title">Your Favorite Movies</h1>
+        <p className="page-description">
+          Your personal collection of favorite films. You have {favorites.length} movie{favorites.length !== 1 ? 's' : ''} saved.
+        </p>
+
+        <MovieList 
+          movies={favorites} 
+          showViewAll={false}
+          horizontalScroll={false}
+        />
+      </div>
+    );
+  }
 
   return (
-    <div className="favorites-empty">
-      <h2>No Favorites Movies Yet</h2>
-      <p>Start adding movies to your favorite</p>
+    <div className="home">
+      <h1 className="page-title">Your Favorite Movies</h1>
+      <p className="page-description">
+        Start adding movies to your favorites collection by clicking the heart icon on any movie.
+      </p>
+      
+      <div className="empty-state">
+        <div className="empty-state-icon">❤️</div>
+        <h2>No Favorite Movies Yet</h2>
+        <p>Start adding movies to your favorites</p>
+      </div>
     </div>
   );
 }

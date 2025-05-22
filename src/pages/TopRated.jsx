@@ -44,9 +44,7 @@ const TopRated = () => {
         Discover critically acclaimed films with the highest ratings from audiences around the world.
       </p>
       
-      <div className="page-header">
-        <Link to="/" className="back-button">Back to Home</Link>
-      </div>
+      <Link to="/" className="back-button green-back-button">Back to Home</Link>
 
       {error && <div className="error-message">{error}</div>}
       

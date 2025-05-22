@@ -3,16 +3,15 @@
     box-sizing: border-box;
   }
   
-  .page-header {
+  /* .page-header {
     display: flex;
     align-items: center;
     margin-bottom: 1rem;
-  }
+  } */
 
   .back-button {
-    background-color: transparent;
+    background-color: #e50914;
     color: white;
-    border: 2px solid #e50914;
     border-radius: 4px;
     padding: 0.5rem 1rem;
     margin-right: 1rem;
