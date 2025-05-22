@@ -79,3 +79,14 @@ export const getMoviesByGenre = async (genreId, page = 1) => {
   const data = await response.json();
   return data;
 };
+
+export const getTopRatedMovies = async (page = 1) => {
+  const response = await fetch(
+    `${BASE_URL}/movie/top_rated?api_key=${API_KEY}&page=${page}`
+  );
+  if (!response.ok) {
+    throw new Error("Failed to fetch top rated movies");
+  }
+  const data = await response.json();
+  return data;
+};

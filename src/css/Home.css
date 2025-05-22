@@ -61,3 +61,41 @@
     width: 100%;
     box-sizing: border-box;
   }
+
+  .page-title {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+    color: #fff;
+  }
+
+  .page-description {
+    color: #aaa;
+    margin-bottom: 2rem;
+    max-width: 800px;
+    line-height: 1.5;
+  }
+
+  .top-rated-indicator {
+    position: absolute;
+    top: 0.5rem;
+    left: 0.5rem;
+    background: linear-gradient(135deg, #e50914, #ffb300);
+    color: white;
+    padding: 0.3rem 0.6rem;
+    border-radius: 3px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    z-index: 2;
+  }
+
+  @media (max-width: 768px) {
+    .page-title {
+      font-size: 1.8rem;
+      text-align: center;
+    }
+    
+    .page-description {
+      text-align: center;
+      font-size: 0.9rem;
+    }
+  }
